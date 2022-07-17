@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--1-1:CDNを使ってpyScriptを読み込む      -->
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    
+    <!--4-4:pythonで使用するライブラリを記述      -->
+    <py-env>
+      - numpy
+      - matplotlib
+    </py-env>
+    
+    <title>PyScript Playground</title>
+  </head>
+  
+  <body>
+    <main class="py-5 grid gap-y-4 grid-cols-1 place-items-center">
+      <!--2-1:1つ目の方法で文字を表示させる要素を指定        -->
+      <p id="title"></p>
+      <!--3-1:2つ目の方法で文字を表示させる場所を指定        -->
+      <p id="subtitle"></p>
+      
+      <!--4-1:以下のコメントアウトを解除  -->
+                    
+			<p>y=Asin(Bx)+Ccos(Dx)</p>
+			<div>
+				<label>Aの値を入力:
+				  <input type="number" class='textline' value="1" id="avalue">
+				</label>
+			</div>
+			<div>
+				<label>Bの値を入力:
+				  <input type="number" class='textline' value="1" id="bvalue">
+				</label>
+			</div>
+      <div>
+				<label>Cの値を入力:
+				  <input type="number" class='textline' value="1" id="cvalue">
+				</label>
+			</div>
+      <div>
+				<label>Dの値を入力:
+				  <input type="number" class='textline' value="1" id="dvalue">
+				</label>
+			</div>
+      
+      <!--4-1:ここまでコメントアウトを解除        -->
+      
+      <!--4-2:pyscriptの機能でボタンを表示        -->
+      <py-button id="func-button" label="関数を表示"></py-button>
+      <!--4-3:pythonで作成したグラフを表示する場所を設定        -->
+      <div id="func-container"></div>
+
+      <!--5-1:以下のコメントアウトを解除 			 -->
+              
+			<p>PID制御</p>
+			<div>
+				<label>Kp:
+					<input type = "number" class="textline" value="0.1" step = "0.01" min="0" id="kp">
+				</label>
+			</div>
+			<div>
+				<label>Ki:
+					<input type = "number" class="textline" value="0.1" step = "0.01" min="0" id="ki">
+				</label>
+			</div>
+			<div>	
+				<label>Kd:
+					<input type = "number" class="textline" value="0.1" step = "0.01" min="0" id="kd">
+				</label>
+			</div>
+			<py-button id="pid-button" label="グラフを表示"></py-button>
+			<div id="pid-container"></div>
+      
+      <!--5-1:ここまでコメントアウトを解除        -->
+      
+      <!--6-1:py-scriptの機能でreplを表示        -->
+      <py-repl auto-generate="true"></py-repl>
+      
+    </main>
+
+    <!--2-2:2-1で指定した場所に記述する文字を記入      -->
+    <py-script output="title">
+      n=4
+      print('第'+str(n)+'回技術交流会')
+    </py-script>
+    
+    <!--3-2:3-1で指定した場所に記述する文字を記入      -->
+    <py-script>
+      str_subtitle='pyscript入門'
+      pyscript.write('subtitle', str_subtitle)
+    </py-script>
+    
+    <!--4-5:以下のコメントアウトを解除      -->  
+         
+    <py-script>
+			import numpy as np
+			from numpy import pi, sin, cos
+			import matplotlib.pyplot as plt
+      
+			def display_func(*ags,**kwgs):
+        # 4-6:htmlの要素から入力を取得
+        a_element=Element("avalue").element.value
+        b_element=Element("bvalue").element.value
+        c_element=Element("cvalue").element.value
+        d_element=Element("dvalue").element.value
+      
+        # 4-7:入力された値をfloat型に変換
+        a_num=float(a_element)
+        b_num=float(b_element)
+        c_num=float(c_element)
+        d_num=float(d_element)
+      
+        plt.clf()
+        x=[]
+        y=[]
+        for i in range(1000):
+          x.append(2*np.pi/1000*i)
+          y.append(a_num*np.sin(b_num*x[i]) + c_num*np.cos(d_num*x[i]))
+        trace=[x,y]
+        plt.plot(*trace)
+
+        # 4-8:htmlで指定した要素にグラフを出力
+        pyscript.write('func-container', plt)
+      
+      # 4-9:py-buttonの要素を取得
+			func_button=Element('func-button')
+      # 4-10:ボタンがクリックされたときにグラフを表示する関数を実行
+			func_button.element.onclick=display_func
+      
+    </py-script>
+    
+    <!--4-5:ここまでコメントアウトを解除        -->
+
+    <!--5-2:以下のコメントアウトを解除      -->
+      
+		<py-script>
+			import numpy as np
+			import matplotlib.pyplot as plt
+			
+			def pid(*ags,**kwgs):
+				Kp_element=Element("kp").element.value
+				Ki_element=Element("ki").element.value
+				Kd_element=Element("kd").element.value
+				Kp=float(Kp_element)
+				Ki=float(Ki_element)
+				Kd=float(Kd_element)
+				M = 0.00 
+				M1 =  0.00 
+				goal = 50.00  
+				e = 0.00 
+				e1 = 0.00 
+				e2 = 0.00 
+				t = 100
+				x_list = []
+				y_list = []
+
+				x_list.append(0)
+				y_list.append(0.00)
+				plt.clf()
+				for i in range(1,t):
+					M1 = M
+					e2 = e1
+					e1 = e
+					e = goal - y_list[i-1] 
+
+					M = M1 + Kp * (e-e1) + Ki * e - Kd * ((e-e1) - (e1-e2))
+
+					x_list.append(i)
+					y_list.append(M)
+
+				plt.hlines([goal], 0, t, "red", linestyles='dashed') 
+				plt.plot(x_list, y_list, color="b")
+				plt.ylim(0, goal*2) 
+				pyscript.write('pid-container', plt)
+			
+			pid_button = Element("pid-button")
+			pid_button.element.onclick = pid
+		</py-script>
+    
+    <!--5-2:ここまでコメントアウトを解除      -->
+
+    <!--6-2:replで計算できる簡単な関数を作成      -->
+    <py-script>
+      def add_tax(num):
+        return num*1.1
+    </py-script>
+    
+  </body>
+
+</html>
